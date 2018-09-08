@@ -1,6 +1,8 @@
-package server
+package main
 
 import (
+	"../model"
+	"./grep"
 	"log"
 	"net"
 	"net/http"
@@ -12,27 +14,23 @@ type Server struct {
 	Protocol, Port string
 }
 
-// Args Input Arguments for rpc
-type Args struct {
-	A string
-}
-
 // HelloWorld Hello World RPC exapmple
-func (s *Server) HelloWorld(args *Args, reply *string) error {
-	*reply = args.A
+func (s *Server) HelloWorld(args *model.RPCArgs, reply *string) error {
+	*reply = grep.Grep(args.A)
 	return nil
 }
 
-// RegisterServer This function will register and initiate server
-func (s *Server) RegisterServer() {
+// This function will register and initiate server
+func main() {
 	server := new(Server)
+	server.Port = "8080"
 	rpc.Register(server)
 	rpc.HandleHTTP()
 
-	l, e := net.Listen("tcp", ":"+s.Port)
+	l, e := net.Listen("tcp", ":"+server.Port)
 	if e != nil {
 		log.Fatal("listen error: ", e)
 	}
 
-	go http.Serve(l, nil)
+	http.Serve(l, nil)
 }

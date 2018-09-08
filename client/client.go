@@ -1,7 +1,7 @@
-package client
+package main
 
 import (
-	"MP0/server"
+	"../model"
 	"fmt"
 	"log"
 	"net/rpc"
@@ -17,7 +17,7 @@ var serverAddress = "localhost"
 
 // CallRPC example
 func (c *Client) CallRPC(str string) error {
-	args := &server.Args{A: str}
+	args := &model.RPCArgs{A: str}
 
 	var reply string
 	err := c.client.Call("Server.HelloWorld", args, &reply)
@@ -36,4 +36,16 @@ func (c *Client) RegisterClient() error {
 	}
 	c.client = client
 	return err
+}
+
+func main() {
+	c := new(Client)
+	c.PortNumber = "8080"
+	c.ServerAddress = "localhost"
+	err := c.RegisterClient()
+
+	if err != nil {
+		log.Fatal("error registering client:", err)
+	}
+	c.CallRPC("say this!!!")
 }
