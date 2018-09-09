@@ -21,17 +21,14 @@ func newServer() *Server {
 	return &Server{}
 }
 
-// LoadConfigFromJSON load config from config.json
 func (s *Server) loadConfigFromJSON(jsonFile []byte) error {
 	return json.Unmarshal(jsonFile, &s.config)
 }
 
-// GetIP return ip for server
 func (s *Server) getIP() string {
 	return s.config.Current.IP
 }
 
-// GetPort return port for server
 func (s *Server) getPort() int {
 	return s.config.Current.Port
 }

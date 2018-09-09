@@ -39,7 +39,6 @@ func (c *Client) registerClient() (err error) {
 func (c *Client) callRPC(serverID int, args interface{}, reply interface{}) error {
 	err := c.clients[serverID].Call("Server.HelloWorld", args, reply)
 	return err
-	// fmt.Println("Resp: ", reply)
 }
 
 func main() {
