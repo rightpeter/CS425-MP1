@@ -1,7 +1,7 @@
 package main
 
 import (
-	"CS425-MP1/model"
+	"./model"
 	"bufio"
 	"fmt"
 	"io/ioutil"
