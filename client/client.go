@@ -1,7 +1,7 @@
 package main
 
 import (
-	"./model"
+	"../model"
 	"bufio"
 	"fmt"
 	"io/ioutil"
