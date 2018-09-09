@@ -1,12 +1,15 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"io/ioutil"
 	"log"
 	"net/rpc"
+	"os"
 
 	"../model"
+
 	"encoding/json"
 )
 
@@ -36,9 +39,20 @@ func (c *Client) registerClient() (err error) {
 	return err
 }
 
-func (c *Client) callRPC(serverID int, args interface{}, reply interface{}) error {
-	err := c.clients[serverID].Call("Server.HelloWorld", args, reply)
+func (c *Client) callRPC(serverID int, command string, reply interface{}) error {
+	args := &model.RPCArgs{Command: command}
+	err := c.clients[serverID].Call("Server.Grep", args, reply)
 	return err
+}
+
+func (c *Client) distributedGrep(command string, reply interface{}) error {
+	for k := range c.clients {
+		err := c.callRPC(k, command, reply)
+		if err != nil {
+			log.Fatal("Error calling Server.Grep: ", err)
+		}
+	}
+	return nil
 }
 
 func main() {
@@ -55,12 +69,19 @@ func main() {
 		log.Fatal("error registering client:", err)
 	}
 
-	args := &model.RPCArgs{A: "say this!!!"}
-	var reply string
-	err = c.callRPC(1, args, &reply)
-	if err != nil {
-		log.Fatal("Call RPC Failed: ", err)
+	// Take input from user
+	scanner := bufio.NewScanner(os.Stdin)
+	fmt.Print("> ")
+	for scanner.Scan() {
+		fmt.Print("> ")
+		input := scanner.Text()
+		fmt.Println(input)
+		var reply string
+		err := c.distributedGrep(input, &reply)
+		if err != nil {
+			log.Fatal("Call RPC Failed: ", err)
+		}
+		log.Println("Call RPC Suceed: ", reply)
 	}
 
-	log.Println("Call RPC Suceed: ", reply)
 }

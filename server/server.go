@@ -1,8 +1,6 @@
 package main
 
 import (
-	"../model"
-	"./grep"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -10,6 +8,9 @@ import (
 	"net"
 	"net/http"
 	"net/rpc"
+
+	"../model"
+	"./grep"
 )
 
 // Server Server Struct
@@ -33,9 +34,9 @@ func (s *Server) getPort() int {
 	return s.config.Current.Port
 }
 
-// HelloWorld Hello World RPC exapmple
-func (s *Server) HelloWorld(args *model.RPCArgs, reply *string) error {
-	*reply = grep.Grep(args.A)
+// Grep RPC to call grep on server
+func (s *Server) Grep(args *model.RPCArgs, reply *string) error {
+	*reply = grep.Grep(args.Command)
 	return nil
 }
 
