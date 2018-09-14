@@ -9,8 +9,8 @@ import (
 	"net/http"
 	"net/rpc"
 
-	"../model"
-	"./grep"
+	"CS425/CS425-MP1/model"
+	"CS425/CS425-MP1/server/grep"
 )
 
 // Server Server Struct
