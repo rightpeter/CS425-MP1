@@ -7,6 +7,13 @@ build:
                 - CS425
         image: golang:1.9.2
         before_script:
+                # Create a symbolic link under $GOPATH, this is needed for local build
+                # i.e. /go/src/gitlab.com/ykyuen/gitlab-ci-go-build
+                - cd $GOPATH/src
+                - mkdir -p CS425/$CI_PROJECT_NAMESPACE
+                - cd CS425/$CI_PROJECT_NAMESPACE
+                - ln -s $CI_PROJECT_DIR
+                - cd $CI_PROJECT_NAME
         script:
                 # Compile and name the binary as `server.bin` and `client.bin`
                 - go build -o server.bin ./server && go build -o client.bin ./client
