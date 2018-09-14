@@ -10,8 +10,8 @@ build:
                 # Create a symbolic link under $GOPATH, this is needed for local build
                 # i.e. /go/src/gitlab.com/ykyuen/gitlab-ci-go-build
                 - cd $GOPATH/src
-                - mkdir -p CS425/$CI_PROJECT_NAMESPACE
-                - cd CS425/$CI_PROJECT_NAMESPACE
+                - mkdir -p CS425
+                - cd CS425
                 - ln -s $CI_PROJECT_DIR
                 - cd $CI_PROJECT_NAME
         script:
