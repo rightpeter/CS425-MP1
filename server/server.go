@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"flag"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -34,6 +35,14 @@ func (s *Server) getPort() int {
 	return s.config.Current.Port
 }
 
+func (s *Server) setIP(IP string) {
+	s.config.Current.IP = IP
+}
+
+func (s *Server) setPort(port int) {
+	s.config.Current.Port = port
+}
+
 // Grep RPC to call grep on server
 func (s *Server) Grep(args *model.RPCArgs, reply *string) error {
 	*reply = grep.Grep(args.Command)
@@ -42,6 +51,13 @@ func (s *Server) Grep(args *model.RPCArgs, reply *string) error {
 
 // This function will register and initiate server
 func main() {
+	port := flag.Int("p", 8000, "Port number")
+	IP := flag.String("ip", "127.0.0.1", "IP address")
+
+	flag.Parse()
+
+	fmt.Printf("Starting server on IP: %s and port: %d", *IP, *port)
+
 	configFile, e := ioutil.ReadFile("./config.json")
 	if e != nil {
 		log.Fatalf("File error: %v\n", e)
@@ -49,6 +65,9 @@ func main() {
 
 	server := newServer()
 	server.loadConfigFromJSON(configFile)
+
+	server.setIP(*IP)
+	server.setPort(*port)
 
 	rpc.Register(server)
 	rpc.HandleHTTP()

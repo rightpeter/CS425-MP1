@@ -43,9 +43,12 @@ func (c *Client) callRPC(serverID int, command string, chReply chan<- string, ch
 	args := &model.RPCArgs{Command: command}
 	var reply string
 	err := c.clients[serverID].Call("Server.Grep", args, &reply)
+	fmt.Println("Calling grep!")
 	if err != nil {
 		chErr <- err
+		return
 	}
+	fmt.Println("returning grep!")
 	chReply <- reply
 }
 
@@ -71,6 +74,9 @@ func (c *Client) distributedGrep(command string) (string, error) {
 }
 
 func main() {
+
+	fmt.Println("Starting client...")
+
 	configFile, e := ioutil.ReadFile("./config.json")
 	if e != nil {
 		log.Fatalf("File error: %v\n", e)
@@ -88,7 +94,6 @@ func main() {
 	scanner := bufio.NewScanner(os.Stdin)
 	fmt.Print("> ")
 	for scanner.Scan() {
-		fmt.Print("> ")
 		input := scanner.Text()
 		fmt.Println(input)
 		reply, err := c.distributedGrep(input)
@@ -96,6 +101,7 @@ func main() {
 			log.Fatal("Call RPC Failed: ", err)
 		}
 		log.Println("Call RPC Suceeded: ", reply)
+		fmt.Print("> ")
 	}
 
 }
