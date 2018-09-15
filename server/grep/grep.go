@@ -7,13 +7,14 @@ import (
 )
 
 // Grep funcion
-func Grep(grepRules string, path string) string {
+func Grep(grepRules string, path string) (string, error) {
 	args := strings.Fields(grepRules)
 	args = append(args, "/tmp/mp1.log")
 	cmd := exec.Command("grep", args...)
 	out, err := cmd.CombinedOutput()
 	if err != nil {
-		log.Fatalf("cmd.Run() failed with %s\n", err)
+		log.Printf("cmd.Run() failed with %s\n", err)
+		return "", err
 	}
-	return string(out)
+	return string(out), nil
 }
