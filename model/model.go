@@ -5,6 +5,14 @@ type RPCArgs struct {
 	Commands []string
 }
 
+// RPCResult Result for rpc
+type RPCResult struct {
+	ClientID int
+	Reply    string
+	Alive    bool
+	Error    error
+}
+
 type nodeConfig struct {
 	ID      int    `json:"id"`
 	IP      string `json:"ip"`
