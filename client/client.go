@@ -35,7 +35,7 @@ func (c *Client) callRPC(client *rpc.Client, commands []string) (string, error) 
 
 func (c *Client) distribuitedGrep(clientID int, commands []string) model.RPCResult {
 	result := model.RPCResult{ClientID: clientID}
-	conn, err := net.DialTimeout("tcp", fmt.Sprintf("%s:%d", c.config.Nodes[clientID].IP, c.config.Nodes[clientID].Port), 0.3*time.Second)
+	conn, err := net.DialTimeout("tcp", fmt.Sprintf("%s:%d", c.config.Nodes[clientID].IP, c.config.Nodes[clientID].Port), 300*time.Millisecond)
 	if err != nil {
 		result.Alive = false
 		return result
