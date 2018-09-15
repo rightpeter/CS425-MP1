@@ -18,7 +18,7 @@ Server:
 
 	./server.bin -p <PORT_NUMBER> -IP <IP_ADDRESS>
 
-	// -IP is currently optional
+	// IP flag is currently optional
 
 Client:
 

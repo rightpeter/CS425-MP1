@@ -8,7 +8,7 @@ import (
 	"net/rpc"
 	"os"
 
-	"CS425-MP1/model"
+	"CS425/CS425-MP1/model"
 
 	"encoding/json"
 )
