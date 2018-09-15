@@ -16,7 +16,9 @@ to build excecutable files.
 
 Server:
 
-	./server.bin
+	./server.bin -p <PORT_NUMBER> -IP <IP_ADDRESS>
+
+	// -IP is currently optional
 
 Client:
 

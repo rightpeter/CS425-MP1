@@ -8,7 +8,7 @@ import (
 	"net/rpc"
 	"os"
 
-	"CS425/CS425-MP1/model"
+	"CS425-MP1/model"
 
 	"encoding/json"
 )
@@ -52,7 +52,7 @@ func (c *Client) callRPC(serverID int, command string, chReply chan<- string, ch
 	chReply <- reply
 }
 
-func (c *Client) distributedGrep(command string) (string, error) {
+func (c *Client) distributedGrep(command string) string {
 	replies := make(chan string)
 	errors := make(chan error)
 	var reply string
@@ -70,7 +70,7 @@ func (c *Client) distributedGrep(command string) (string, error) {
 			log.Println("Error grepping: ", err)
 		}
 	}
-	return reply, nil
+	return reply
 }
 
 func main() {
@@ -96,10 +96,7 @@ func main() {
 	for scanner.Scan() {
 		input := scanner.Text()
 		fmt.Println(input)
-		reply, err := c.distributedGrep(input)
-		if err != nil {
-			log.Fatal("Call RPC Failed: ", err)
-		}
+		reply := c.distributedGrep(input)
 		log.Println("Call RPC Suceeded: ", reply)
 		fmt.Print("> ")
 	}
