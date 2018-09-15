@@ -52,9 +52,9 @@ func (s *Server) setFilePath(path string) {
 }
 
 // Grep RPC to call grep on server
-func (s *Server) Grep(args *model.RPCArgs, reply *string) error {
-	*reply = grep.Grep(args.Command, s.getFilePath())
-	return nil
+func (s *Server) Grep(args *model.RPCArgs, reply *string) (err error) {
+	*reply, err = grep.Grep(args.Command, s.getFilePath())
+	return err
 }
 
 // This function will register and initiate server
