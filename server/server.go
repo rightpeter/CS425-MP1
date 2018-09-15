@@ -7,7 +7,6 @@ import (
 	"io/ioutil"
 	"log"
 	"net"
-	"net/http"
 	"net/rpc"
 
 	"CS425/CS425-MP1/model"
@@ -79,13 +78,13 @@ func main() {
 	server.setPort(*port)
 	server.setFilePath(*logPath)
 
-	rpc.Register(server)
-	rpc.HandleHTTP()
+	newServer := rpc.NewServer()
+	newServer.Register(server)
 
 	l, e := net.Listen("tcp", fmt.Sprintf(":%d", server.getPort()))
 	if e != nil {
 		log.Fatal("listen error: ", e)
 	}
 
-	http.Serve(l, nil)
+	newServer.Accept(l)
 }

@@ -4,8 +4,10 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"net"
 	"net/rpc"
 	"os"
+	"time"
 
 	"CS425/CS425-MP1/model"
 
@@ -14,60 +16,64 @@ import (
 
 // Client struct
 type Client struct {
-	clients map[int]*rpc.Client
-	config  model.NodesConfig
-}
-
-func newClient() *Client {
-	return &Client{clients: make(map[int]*rpc.Client)}
+	config model.NodesConfig
 }
 
 func (c *Client) loadConfigFromJSON(jsonFile []byte) error {
 	return json.Unmarshal(jsonFile, &c.config)
 }
 
-func (c *Client) registerClient() (err error) {
-	for _, v := range c.config.Nodes {
-		client, err := rpc.DialHTTP("tcp", fmt.Sprintf("%s:%d", v.IP, v.Port))
-		if err != nil {
-			log.Println("dialing: ", err)
-			continue
-		}
-		c.clients[v.ID] = client
-	}
-	return err
-}
-
-func (c *Client) callRPC(serverID int, commands []string, chReply chan<- string, chErr chan<- error) {
-	args := &model.RPCArgs{Commands: commands}
+func (c *Client) callRPC(client *rpc.Client, commands []string) (string, error) {
+	args := model.RPCArgs{Commands: commands}
 	var reply string
-	err := c.clients[serverID].Call("Server.Grep", args, &reply)
+	err := client.Call("Server.Grep", &args, &reply)
 	if err != nil {
-		chErr <- err
-		return
+		return "", err
 	}
-	chReply <- reply
+	return reply, nil
 }
 
-func (c *Client) distributedGrep(commands []string) string {
-	replies := make(chan string)
-	errors := make(chan error)
-	var reply string
+func (c *Client) distribuitedGrep(clientID int, commands []string) model.RPCResult {
+	result := model.RPCResult{ClientID: clientID}
+	conn, err := net.DialTimeout("tcp", fmt.Sprintf("%s:%d", c.config.Nodes[clientID].IP, c.config.Nodes[clientID].Port), 300*time.Millisecond)
+	if err != nil {
+		result.Alive = false
+		return result
+	}
+	defer conn.Close()
 
-	for k := range c.clients {
-		go c.callRPC(k, commands, replies, errors)
+	client := rpc.NewClient(conn)
+	defer client.Close()
+
+	result.Alive = true
+
+	reply, err := c.callRPC(client, commands)
+	if err != nil {
+		result.Error = err
+		return result
+	}
+	result.Reply = reply
+	return result
+
+}
+
+// DistributedGrep non blocking distributed grep
+func (c *Client) DistributedGrep(commands []string) {
+	ch := make(chan model.RPCResult)
+	for k := range c.config.Nodes {
+		go func(clientID int) {
+			select {
+			case ch <- c.distribuitedGrep(clientID, commands):
+			case <-time.After(time.Second):
+				ch <- model.RPCResult{ClientID: clientID, Alive: false}
+			}
+		}(k)
 	}
 
-	// append replies
-	for i := 0; i < len(c.clients); i++ {
-		select {
-		case rep := <-replies:
-			reply += rep
-		case err := <-errors:
-			log.Println("Error grepping: ", err)
-		}
+	for range c.config.Nodes {
+		result := <-ch
+		log.Printf("Result.ClientID: %d, Result.Alive: %v, Result.Reply: %v\n", result.ClientID, result.Alive, len(result.Reply))
 	}
-	return reply
 }
 
 func main() {
@@ -76,14 +82,8 @@ func main() {
 		log.Fatalf("File error: %v\n", e)
 	}
 
-	c := newClient()
+	c := &Client{}
 	c.loadConfigFromJSON(configFile)
 
-	err := c.registerClient()
-	if err != nil {
-		log.Println("error registering client:", err)
-	}
-
-	reply := c.distributedGrep(os.Args[1:])
-	log.Println(reply)
+	c.DistributedGrep(os.Args[1:])
 }

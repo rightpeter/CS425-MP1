@@ -17,6 +17,12 @@
             "ip": "127.0.0.1",
             "port": 8081,
             "log_path": "/tmp/mp1.log"
+        },
+        {
+            "id": 3,
+            "ip": "192.168.1.23",
+            "port": 8081,
+            "log_path": "/tmp/mp1.log"
         }
     ]
 }
