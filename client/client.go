@@ -1,8 +1,6 @@
 package main
 
 import (
-	"bufio"
-	"flag"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -40,8 +38,8 @@ func (c *Client) registerClient() (err error) {
 	return err
 }
 
-func (c *Client) callRPC(serverID int, command string, chReply chan<- string, chErr chan<- error) {
-	args := &model.RPCArgs{Command: command}
+func (c *Client) callRPC(serverID int, commands []string, chReply chan<- string, chErr chan<- error) {
+	args := &model.RPCArgs{Commands: commands}
 	var reply string
 	err := c.clients[serverID].Call("Server.Grep", args, &reply)
 	if err != nil {
@@ -51,13 +49,13 @@ func (c *Client) callRPC(serverID int, command string, chReply chan<- string, ch
 	chReply <- reply
 }
 
-func (c *Client) distributedGrep(command string) string {
+func (c *Client) distributedGrep(commands []string) string {
 	replies := make(chan string)
 	errors := make(chan error)
 	var reply string
 
 	for k := range c.clients {
-		go c.callRPC(k, command, replies, errors)
+		go c.callRPC(k, commands, replies, errors)
 	}
 
 	// append replies
@@ -73,12 +71,6 @@ func (c *Client) distributedGrep(command string) string {
 }
 
 func main() {
-	interact := flag.Bool("i", false, "Interact")
-	grepArgs := flag.String("grep", "", "Grep Rules")
-
-	flag.Parse()
-	fmt.Println("Starting client...")
-
 	configFile, e := ioutil.ReadFile("./config.json")
 	if e != nil {
 		log.Fatalf("File error: %v\n", e)
@@ -92,20 +84,6 @@ func main() {
 		log.Println("error registering client:", err)
 	}
 
-	if *grepArgs != "" {
-		reply := c.distributedGrep(*grepArgs)
-		log.Println("Call RPC Suceeded: ", reply)
-	}
-
-	if *interact {
-		// Take input from user
-		scanner := bufio.NewScanner(os.Stdin)
-		fmt.Print("> ")
-		for scanner.Scan() {
-			input := scanner.Text()
-			reply := c.distributedGrep(input)
-			fmt.Println(reply)
-			fmt.Print("> ")
-		}
-	}
+	reply := c.distributedGrep(os.Args[1:])
+	log.Println(reply)
 }
