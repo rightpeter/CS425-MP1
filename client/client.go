@@ -44,12 +44,10 @@ func (c *Client) callRPC(serverID int, command string, chReply chan<- string, ch
 	args := &model.RPCArgs{Command: command}
 	var reply string
 	err := c.clients[serverID].Call("Server.Grep", args, &reply)
-	fmt.Println("Calling grep!")
 	if err != nil {
 		chErr <- err
 		return
 	}
-	fmt.Println("returning grep!")
 	chReply <- reply
 }
 
@@ -105,9 +103,8 @@ func main() {
 		fmt.Print("> ")
 		for scanner.Scan() {
 			input := scanner.Text()
-			fmt.Println(input)
 			reply := c.distributedGrep(input)
-			log.Println("Call RPC Suceeded: ", reply)
+			fmt.Println(reply)
 			fmt.Print("> ")
 		}
 	}

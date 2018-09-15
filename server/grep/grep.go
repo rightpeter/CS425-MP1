@@ -9,7 +9,7 @@ import (
 // Grep funcion
 func Grep(grepRules string, path string) (string, error) {
 	args := strings.Fields(grepRules)
-	args = append(args, "/tmp/mp1.log")
+	args = append(args, "tmp/mp1.log")
 	cmd := exec.Command("grep", args...)
 	out, err := cmd.CombinedOutput()
 	if err != nil {
