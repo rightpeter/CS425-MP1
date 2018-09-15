@@ -53,7 +53,7 @@ func (s *Server) setFilePath(path string) {
 
 // Grep RPC to call grep on server
 func (s *Server) Grep(args *model.RPCArgs, reply *string) (err error) {
-	*reply, err = grep.Grep(args.Command, s.getFilePath())
+	*reply, err = grep.Grep(args.Commands, s.getFilePath())
 	return err
 }
 

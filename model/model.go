@@ -2,7 +2,7 @@ package model
 
 // RPCArgs Input Arguments for rpc
 type RPCArgs struct {
-	Command string
+	Commands []string
 }
 
 type nodeConfig struct {
