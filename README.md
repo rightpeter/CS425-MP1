@@ -22,4 +22,4 @@ Server:
 
 Client:
 
-	./client.bin
+	./client.bin -i -grep "GREP_PATTERNS"

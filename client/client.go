@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"flag"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -32,7 +33,7 @@ func (c *Client) registerClient() (err error) {
 		client, err := rpc.DialHTTP("tcp", fmt.Sprintf("%s:%d", v.IP, v.Port))
 		if err != nil {
 			log.Println("dialing: ", err)
-			break
+			continue
 		}
 		c.clients[v.ID] = client
 	}
@@ -74,7 +75,10 @@ func (c *Client) distributedGrep(command string) string {
 }
 
 func main() {
+	interact := flag.Bool("i", false, "Interact")
+	grepArgs := flag.String("grep", "", "Grep Rules")
 
+	flag.Parse()
 	fmt.Println("Starting client...")
 
 	configFile, e := ioutil.ReadFile("./config.json")
@@ -87,18 +91,24 @@ func main() {
 
 	err := c.registerClient()
 	if err != nil {
-		log.Fatal("error registering client:", err)
+		log.Println("error registering client:", err)
 	}
 
-	// Take input from user
-	scanner := bufio.NewScanner(os.Stdin)
-	fmt.Print("> ")
-	for scanner.Scan() {
-		input := scanner.Text()
-		fmt.Println(input)
-		reply := c.distributedGrep(input)
+	if *grepArgs != "" {
+		reply := c.distributedGrep(*grepArgs)
 		log.Println("Call RPC Suceeded: ", reply)
-		fmt.Print("> ")
 	}
 
+	if *interact {
+		// Take input from user
+		scanner := bufio.NewScanner(os.Stdin)
+		fmt.Print("> ")
+		for scanner.Scan() {
+			input := scanner.Text()
+			fmt.Println(input)
+			reply := c.distributedGrep(input)
+			log.Println("Call RPC Suceeded: ", reply)
+			fmt.Print("> ")
+		}
+	}
 }
