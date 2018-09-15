@@ -16,7 +16,7 @@ to build excecutable files.
 
 Server:
 
-	./server.bin -p <PORT_NUMBER> -IP <IP_ADDRESS>
+	./server.bin -p <PORT_NUMBER> -ip <IP_ADDRESS>
 
 	// IP flag is currently optional
 
