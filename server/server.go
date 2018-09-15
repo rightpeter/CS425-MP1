@@ -31,33 +31,34 @@ func (s *Server) getIP() string {
 	return s.config.Current.IP
 }
 
-func (s *Server) getPort() int {
-	return s.config.Current.Port
-}
-
 func (s *Server) setIP(IP string) {
 	s.config.Current.IP = IP
+}
+
+func (s *Server) getPort() int {
+	return s.config.Current.Port
 }
 
 func (s *Server) setPort(port int) {
 	s.config.Current.Port = port
 }
 
+func (s *Server) getFilePath() string {
+	return s.config.Current.LogPath
+}
+
+func (s *Server) setFilePath(path string) {
+	s.config.Current.LogPath = path
+}
+
 // Grep RPC to call grep on server
 func (s *Server) Grep(args *model.RPCArgs, reply *string) error {
-	*reply = grep.Grep(args.Command)
+	*reply = grep.Grep(args.Command, s.getFilePath())
 	return nil
 }
 
 // This function will register and initiate server
 func main() {
-	port := flag.Int("p", 8000, "Port number")
-	IP := flag.String("ip", "127.0.0.1", "IP address")
-
-	flag.Parse()
-
-	fmt.Printf("Starting server on IP: %s and port: %d", *IP, *port)
-
 	configFile, e := ioutil.ReadFile("./config.json")
 	if e != nil {
 		log.Fatalf("File error: %v\n", e)
@@ -66,8 +67,17 @@ func main() {
 	server := newServer()
 	server.loadConfigFromJSON(configFile)
 
+	port := flag.Int("p", server.getPort(), "Port number")
+	IP := flag.String("ip", server.getIP(), "IP address")
+	logPath := flag.String("f", server.getFilePath(), "Log file path")
+
+	flag.Parse()
+
+	fmt.Printf("Starting server on IP: %s and port: %d", *IP, *port)
+
 	server.setIP(*IP)
 	server.setPort(*port)
+	server.setFilePath(*logPath)
 
 	rpc.Register(server)
 	rpc.HandleHTTP()
