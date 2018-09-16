@@ -9,6 +9,7 @@ def unit_test(grep_args,expected_line_count):
     print("Testing pattern: {0}".format(grep_args))
     if line_count!=expected_line_count:
         print("Unit test failed for arguments: {0}. Expected line count: {1} Got: {2}".format(grep_args, expected_line_count,line_count))
+        return
     print("Test passed!")
 
 if __name__ == '__main__':  
@@ -29,6 +30,6 @@ if __name__ == '__main__':
     unit_test("quertyvm",10)
 
     # Known pattern on all vms (regex)
-    unit_test("quertyv*",10)
+    unit_test("quertyvm*",10)
 
 
