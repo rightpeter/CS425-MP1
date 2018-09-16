@@ -14,19 +14,16 @@ def unit_test(grep_args,expected_line_count):
 if __name__ == '__main__':  
 
     # Known pattern on only one vm
-    unit_test("vm2",2)
-
-    # Known pattern on only one vm
-    unit_test("qwertyvm2",2)
+    unit_test("qwertyvm2",1)
 
     # Known pattern on two vms
-    unit_test("vm2\|vm3",4)
+    unit_test("zxcvvm2\|zxcvvm3",2)
 
     # Known pattern on three vms
-    unit_test("vm1\|vm2\|vm3",6)
+    unit_test("zxcvvm1\|zxcvvm2\|zxcvvm3",3)
 
     # Known pattern on no vms
-    unit_test("vm2\&vm3",0)
+    unit_test("zxcvvm2\&zxcvvm3",0)
 
     # Known pattern on all vms
     unit_test("quertyvm",10)
