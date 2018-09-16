@@ -62,7 +62,6 @@ func main() {
 	configFilePath := flag.String("c", "./config.json", "Config file path")
 	port := flag.Int("p", 8080, "Port number")
 	IP := flag.String("ip", "0.0.0.0", "IP address")
-	logPath := flag.String("f", "./config.json", "Log file path")
 
 	flag.Parse()
 
@@ -76,7 +75,7 @@ func main() {
 
 	server.setIP(*IP)
 	server.setPort(*port)
-	server.setFilePath(*logPath)
+	server.setFilePath(server.getFilePath())
 
 	fmt.Printf("Starting server on IP: %s and port: %d", *IP, *port)
 
