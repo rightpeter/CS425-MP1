@@ -13,7 +13,8 @@ type RPCResult struct {
 	Error    error
 }
 
-type nodeConfig struct {
+// NodeConfig Structure of node config
+type NodeConfig struct {
 	ID      int    `json:"id"`
 	IP      string `json:"ip"`
 	Port    int    `json:"port"`
@@ -22,6 +23,6 @@ type nodeConfig struct {
 
 // NodesConfig structure to unmarshal json config file {id: int, ip: string, port: int}
 type NodesConfig struct {
-	Current nodeConfig   `json:"current"`
-	Nodes   []nodeConfig `json:"nodes"`
+	Current NodeConfig   `json:"current"`
+	Nodes   []NodeConfig `json:"nodes"`
 }
