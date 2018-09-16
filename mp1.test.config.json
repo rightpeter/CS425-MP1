@@ -1,0 +1,70 @@
+{
+    "current": {
+        "id": 1,
+        "ip": "0.0.0.0",
+        "port": 8080,
+        "log_path": "/tmp/vm1.test.log"
+    },
+    "nodes": [
+        {
+            "id": 1,
+            "ip": "172.22.156.105",
+            "port": 8080,
+            "log_path": "/tmp/vm1.test.log"
+        },
+        {
+            "id": 2,
+            "ip": "172.22.158.105",
+            "port": 8080,
+            "log_path": "/tmp/vm2.test.log"
+        },
+        {
+            "id": 3,
+            "ip": "172.22.154.106",
+            "port": 8080,
+            "log_path": "/tmp/vm3.test.log"
+        },
+        {
+            "id": 4,
+            "ip": "172.22.156.106",
+            "port": 8080,
+            "log_path": "/tmp/vm4.test.log"
+        },
+        {
+            "id": 5,
+            "ip": "172.22.158.106",
+            "port": 8080,
+            "log_path": "/tmp/vm5.test.log"
+        },
+        {
+            "id": 6,
+            "ip": "172.22.154.107",
+            "port": 8080,
+            "log_path": "/tmp/vm6.test.log"
+        },
+        {
+            "id": 7,
+            "ip": "172.22.156.107",
+            "port": 8080,
+            "log_path": "/tmp/vm7.test.log"
+        },
+        {
+            "id": 8,
+            "ip": "172.22.158.107",
+            "port": 8080,
+            "log_path": "/tmp/vm8.test.log"
+        },
+        {
+            "id": 9,
+            "ip": "172.22.154.108",
+            "port": 8080,
+            "log_path": "/tmp/vm9.test.log"
+        },
+        {
+            "id": 10,
+            "ip": "172.22.156.108",
+            "port": 8080,
+            "log_path": "/tmp/vm10.test.log"
+        }
+    ]
+}

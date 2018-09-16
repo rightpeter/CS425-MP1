@@ -20,20 +20,20 @@ def send_log_file(vm_name, file_name):
     os.system("scp ./{0} {1}:/tmp/".format(file_name, vm_name))
 
 def send_config_file(vm):
-    os.system("scp ./config.json {1}:/tmp/".format(vm))
+    os.system("scp ./mp1.test.config.json {0}:/tmp/".format(vm))
 
+# Will send config file and log file to all the vms
 def send_files_to_vm(vm):
-    log_file_name="{0}.log".format(vm)
-    known_pattern = "qwerty{0}qwerty\n{0}".format(vm)
+    log_file_name="{0}.test.log".format(vm)
+    known_pattern = "qwerty{0}qwerty\nzxcv{0}zxcv".format(vm)
     generate_random_file(log_file_name,1024,known_pattern)
     send_log_file(vm,log_file_name)
     send_config_file(vm)
 
-if __name__ == '__main__':
-    
+if __name__ == '__main__': 
     num_vms = 10
     for i in xrange(1,num_vms+1):
+        print('Sending files for vm: ',i)
         vm_name = "vm{0}".format(str(i))
         send_files_to_vm(vm_name)
 
-# scp ./test.txt vm1:/tmp

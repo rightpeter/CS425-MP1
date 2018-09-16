@@ -1,7 +1,7 @@
 import os
 
 def get_line_count(output):
-    return 0
+    return int(output.split('Total line count:')[-1])
 
 def unit_test(grep_args,expected_line_count):
     output = os.popen('./client.bin "{0}"'.format(grep_args)).read()
@@ -11,6 +11,26 @@ def unit_test(grep_args,expected_line_count):
     print("Test passed!")
 
 if __name__ == '__main__':  
+
+    # Known pattern on only one vm
     unit_test("vm2",2)
-    unit_test("vm*",10)
-    unit_test("vm",10)
+
+    # Known pattern on only one vm
+    unit_test("qwertyvm2",2)
+
+    # Known pattern on two vms
+    unit_test("vm2\|vm3",4)
+
+    # Known pattern on three vms
+    unit_test("vm0\|vm2\|vm3",6)
+
+    # Known pattern on no vms
+    unit_test("vm2\&vm3",0)
+
+    # Known pattern on all vms
+    unit_test("quertyvm",10)
+
+    # Known pattern on all vms (regex)
+    unit_test("quertyv*",10)
+
+
