@@ -1,11 +1,16 @@
 import os
 
+def get_line_count(output):
+    return 0
 
-def unit_test(grep_args,expected_output):
+def unit_test(grep_args,expected_line_count):
     output = os.popen('./client.bin "{0}"'.format(grep_args)).read()
-    if output!=expected_output:
-        print("Unit test failed for arguments: {0}. Expected : {1} Got output: {2}".format(grep_args,expected_output,output))
+    line_count = get_line_count(output)
+    if line_count!=expected_line_count:
+        print("Unit test failed for arguments: {0}. Expected line count: {1} Got: {2}".format(grep_args, expected_line_count,line_count))
+    print("Test passed!")
 
-
-if __name__ == '__main__':
-    unit_test("MP1","MP1\nMP1")
+if __name__ == '__main__':  
+    unit_test("vm2",2)
+    unit_test("vm*",10)
+    unit_test("vm",10)
