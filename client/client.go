@@ -1,12 +1,15 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"io/ioutil"
 	"log"
 	"net"
 	"net/rpc"
 	"os"
+	"strconv"
+	"strings"
 	"time"
 
 	"CS425/CS425-MP1/model"
@@ -72,7 +75,28 @@ func (c *Client) DistributedGrep(commands []string) {
 
 	for range c.config.Nodes {
 		result := <-ch
-		log.Printf("Result.ClientID: %d, Result.Alive: %v, Result.Reply: %v\n", result.ClientID, result.Alive, len(result.Reply))
+		fmt.Println(strings.Repeat("+", 30) + "[VM" + strconv.Itoa(result.ClientID) + "]" + strings.Repeat("+", 30))
+
+		if !result.Alive {
+			fmt.Printf("VM%d died!\n\n", result.ClientID)
+		} else if result.Error != nil {
+			if result.Error.Error() == "exit status 1" {
+				fmt.Printf("Lines Count: 0\n\n")
+			} else {
+				fmt.Printf("Grep fail! Error: %v\n\n", result.Error)
+			}
+		} else {
+			r := strings.NewReader(result.Reply)
+			scanner := bufio.NewScanner(r)
+
+			line := 0
+			for scanner.Scan() {
+				fmt.Println(scanner.Text())
+				line++
+			}
+
+			fmt.Printf("Lines Count: %d\n\n", line)
+		}
 	}
 }
 
