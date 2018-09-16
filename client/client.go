@@ -67,7 +67,7 @@ func (c *Client) DistributedGrep(commands []string) {
 		go func(clientID int) {
 			select {
 			case ch <- c.distribuitedGrep(clientID, commands):
-			case <-time.After(time.Second):
+			case <-time.After(500 * time.Second):
 				ch <- model.RPCResult{ClientID: clientID, Alive: false}
 			}
 		}(k)
