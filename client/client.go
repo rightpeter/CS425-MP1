@@ -8,6 +8,7 @@ import (
 	"net"
 	"net/rpc"
 	"os"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -36,9 +37,9 @@ func (c *Client) callRPC(client *rpc.Client, commands []string) (string, error) 
 	return reply, nil
 }
 
-func (c *Client) distribuitedGrep(clientID int, commands []string) model.RPCResult {
-	result := model.RPCResult{ClientID: clientID}
-	conn, err := net.DialTimeout("tcp", fmt.Sprintf("%s:%d", c.config.Nodes[clientID].IP, c.config.Nodes[clientID].Port), 300*time.Millisecond)
+func (c *Client) distribuitedGrep(clientConfig model.NodeConfig, commands []string) model.RPCResult {
+	result := model.RPCResult{ClientID: clientConfig.ID}
+	conn, err := net.DialTimeout("tcp", fmt.Sprintf("%s:%d", clientConfig.IP, clientConfig.Port), 300*time.Millisecond)
 	if err != nil {
 		result.Alive = false
 		return result
@@ -63,27 +64,31 @@ func (c *Client) distribuitedGrep(clientID int, commands []string) model.RPCResu
 // DistributedGrep non blocking distributed grep
 func (c *Client) DistributedGrep(commands []string) {
 	ch := make(chan model.RPCResult)
-	for k := range c.config.Nodes {
-		go func(clientID int) {
+	for _, v := range c.config.Nodes {
+		go func(clientConfig model.NodeConfig) {
 			select {
-			case ch <- c.distribuitedGrep(clientID, commands):
+			case ch <- c.distribuitedGrep(clientConfig, commands):
 			case <-time.After(500 * time.Second):
-				ch <- model.RPCResult{ClientID: clientID, Alive: false}
+				ch <- model.RPCResult{ClientID: clientConfig.ID, Alive: false}
 			}
-		}(k)
+		}(v)
 	}
 
+	summary := make(map[int]int)
 	for range c.config.Nodes {
 		result := <-ch
 		fmt.Println(strings.Repeat("+", 30) + "[VM" + strconv.Itoa(result.ClientID) + "]" + strings.Repeat("+", 30))
 
 		if !result.Alive {
 			fmt.Printf("VM%d died!\n\n", result.ClientID)
+			summary[result.ClientID] = -2
 		} else if result.Error != nil {
 			if result.Error.Error() == "exit status 1" {
 				fmt.Printf("Lines Count: 0\n\n")
+				summary[result.ClientID] = 0
 			} else {
 				fmt.Printf("Grep fail! Error: %v\n\n", result.Error)
+				summary[result.ClientID] = -1
 			}
 		} else {
 			r := strings.NewReader(result.Reply)
@@ -96,8 +101,26 @@ func (c *Client) DistributedGrep(commands []string) {
 			}
 
 			fmt.Printf("Lines Count: %d\n\n", line)
+			summary[result.ClientID] = line
 		}
 	}
+	var keys []int
+	for k := range summary {
+		keys = append(keys, k)
+	}
+	sort.Ints(keys)
+	total := 0
+	for _, k := range keys {
+		if summary[k] == -2 {
+			fmt.Printf("VM%d: Failed, ", k)
+		} else if summary[k] == -1 {
+			fmt.Printf("VM%d: Grep Error, ", k)
+		} else {
+			total += summary[k]
+			fmt.Printf("VM%d: %d, ", k, summary[k])
+		}
+	}
+	fmt.Printf("\nTotal line count: %d\n", total)
 }
 
 func main() {
