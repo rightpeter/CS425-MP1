@@ -5,3 +5,5 @@ logs
 *.zip
 
 config.json
+
+benchmark*.json
