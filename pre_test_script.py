@@ -1,6 +1,8 @@
 import os
 import string
 import random
+import json
+
 
 # reference: http://www.bswen.com/2018/04/python-How-to-generate-random-large-file-using-python.html
 def generate_random_file(filename, size, know_pattern):
@@ -19,7 +21,18 @@ def generate_random_file(filename, size, know_pattern):
 def send_log_file(vm_name, file_name):
     os.system("scp ./{0} {1}:/tmp/".format(file_name, vm_name))
 
+
+def edit_config_file(filepath, vm_num):
+    config=None
+    with open(filepath,'r') as f:
+        config = json.load(f)
+    config['current']['id'] = vm_num
+    config['current']['log_path'] = '/tmp/vm{0}.test.log'.format(str(vm_num))
+    with open(filepath,'w') as f:
+        json.dump(config,f)
+
 def send_config_file(vm):
+    edit_config_file('./mp1.test.config.json', int(vm.split('vm')[-1]))
     os.system("scp ./mp1.test.config.json {0}:/tmp/".format(vm))
 
 # Will send config file and log file to all the vms
@@ -29,6 +42,7 @@ def send_files_to_vm(vm):
     generate_random_file(log_file_name,1024,known_pattern)
     send_log_file(vm,log_file_name)
     send_config_file(vm)
+
 
 if __name__ == '__main__': 
     num_vms = 10
