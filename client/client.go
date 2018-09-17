@@ -65,6 +65,7 @@ func (c *Client) distribuitedGrep(clientConfig model.NodeConfig, commands []stri
 func (c *Client) DistributedGrep(commands []string) {
 	ch := make(chan model.RPCResult)
 	for _, v := range c.config.Nodes {
+		// Use goroutine for non-blocking grep
 		go func(clientConfig model.NodeConfig) {
 			select {
 			case ch <- c.distribuitedGrep(clientConfig, commands):
@@ -75,6 +76,7 @@ func (c *Client) DistributedGrep(commands []string) {
 	}
 
 	summary := make(map[int]int)
+	// collect results from pipeline ch, and print it out
 	for range c.config.Nodes {
 		result := <-ch
 		fmt.Println(strings.Repeat("+", 30) + "[VM" + strconv.Itoa(result.ClientID) + "]" + strings.Repeat("+", 30))
@@ -104,6 +106,7 @@ func (c *Client) DistributedGrep(commands []string) {
 			summary[result.ClientID] = line
 		}
 	}
+	// sort keys to print summary from VM0 to VM10
 	var keys []int
 	for k := range summary {
 		keys = append(keys, k)

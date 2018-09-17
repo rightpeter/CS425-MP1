@@ -59,17 +59,20 @@ func (s *Server) Grep(args *model.RPCArgs, reply *string) (err error) {
 // This function will register and initiate server
 func main() {
 
+	// parse argument
 	configFilePath := flag.String("c", "./config.json", "Config file path")
 	port := flag.Int("p", 8080, "Port number")
 	IP := flag.String("ip", "0.0.0.0", "IP address")
 
 	flag.Parse()
 
+	// load config file
 	configFile, e := ioutil.ReadFile(*configFilePath)
 	if e != nil {
 		log.Fatalf("File error: %v\n", e)
 	}
 
+	// Class for rpc
 	server := newServer()
 	server.loadConfigFromJSON(configFile)
 
@@ -79,6 +82,7 @@ func main() {
 
 	fmt.Printf("Starting server on IP: %s and port: %d", *IP, *port)
 
+	// init the rpc server
 	newServer := rpc.NewServer()
 	newServer.Register(server)
 
@@ -87,5 +91,6 @@ func main() {
 		log.Fatal("listen error: ", e)
 	}
 
+	// server start
 	newServer.Accept(l)
 }
