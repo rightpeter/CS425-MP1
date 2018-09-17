@@ -58,7 +58,14 @@ func (s *Server) Grep(args *model.RPCArgs, reply *string) (err error) {
 
 // This function will register and initiate server
 func main() {
-	configFile, e := ioutil.ReadFile("./config.json")
+
+	configFilePath := flag.String("c", "./config.json", "Config file path")
+	port := flag.Int("p", 8080, "Port number")
+	IP := flag.String("ip", "0.0.0.0", "IP address")
+
+	flag.Parse()
+
+	configFile, e := ioutil.ReadFile(*configFilePath)
 	if e != nil {
 		log.Fatalf("File error: %v\n", e)
 	}
@@ -66,17 +73,11 @@ func main() {
 	server := newServer()
 	server.loadConfigFromJSON(configFile)
 
-	port := flag.Int("p", server.getPort(), "Port number")
-	IP := flag.String("ip", server.getIP(), "IP address")
-	logPath := flag.String("f", server.getFilePath(), "Log file path")
-
-	flag.Parse()
-
-	fmt.Printf("Starting server on IP: %s and port: %d", *IP, *port)
-
 	server.setIP(*IP)
 	server.setPort(*port)
-	server.setFilePath(*logPath)
+	server.setFilePath(server.getFilePath())
+
+	fmt.Printf("Starting server on IP: %s and port: %d", *IP, *port)
 
 	newServer := rpc.NewServer()
 	newServer.Register(server)
