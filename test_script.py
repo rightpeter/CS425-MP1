@@ -27,9 +27,9 @@ if __name__ == '__main__':
     unit_test("zxcvvm2\&zxcvvm3",0)
 
     # Known pattern on all vms
-    unit_test("quertyvm",10)
+    unit_test("qwertyvm",10)
 
     # Known pattern on all vms (regex)
-    unit_test("quertyvm*",10)
+    unit_test("qwertyvm*",10)
 
 
