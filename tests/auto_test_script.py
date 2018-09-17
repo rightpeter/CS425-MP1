@@ -49,6 +49,7 @@ def send_files_to_vm(vm):
 
 
 def get_line_count(output):
+    """Parse the count line from the output"""
     return re.findall("VM([0-9]+): ([a-zA-Z0-9]+)", output)
 
 
@@ -56,6 +57,8 @@ def unit_test(grep_args, expected_line_count):
     output = os.popen('./client.bin "{0}"'.format(grep_args)).read()
     line_count = get_line_count(output)
     print("Testing pattern: {0}".format(grep_args))
+
+    # Compare the real line_count with expected line count
     for v in line_count:
         if v[1] != expected_line_count:
             print(
