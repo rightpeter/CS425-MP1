@@ -59,15 +59,15 @@ def unit_test(grep_args, expected_line_count):
     print("Testing pattern: {0}".format(grep_args))
 
     # Compare the real line_count with expected line count
-    for v in line_count:
-        if v[1] != expected_line_count:
+    for k in range(10):
+        if line_count[k][1] != expected_line_count[k]:
             print(
                 "Unit test failed for arguments: {} for VM{}. Expected line count: {} Got: {}".
-                format(grep_args, v[0], expected_line_count, v[1]))
+                format(grep_args, line_count[k][0], expected_line_count[k], line_count[k][1]))
         else:
             print(
                 "Unit test passed for arguments: {} for VM{}!!".
-                format(grep_args, v[0]))
+                format(grep_args, line_count[k][0]))
 
 
 def shutdown_normal_servers_and_start_test_servers():
@@ -75,8 +75,10 @@ def shutdown_normal_servers_and_start_test_servers():
     num_vms = 10
     for i in range(1, num_vms + 1):
         print('Shutdown normal server for vm: ', i)
-        os.system("ssh vm{} supervisorctl stop MP1".format(i))
-        os.system("ssh vm{} supervisorctl start MP1_Test".format(i))
+        # os.system("ssh vm{} supervisorctl stop MP1".format(i))
+        os.system("ssh vm{} /home/lihaolu2/.local/bin/supervisorctl -c /tmp/supervisord.conf stop MP1".format(i))
+        # os.system("ssh vm{} supervisorctl start MP1_Test".format(:))
+        os.system("ssh vm{} /home/lihaolu2/.local/bin/supervisorctl -c /tmp/supervisord.conf start MP1_Test".format(i))
 
 
 def shutdown_test_servers_and_start_normal_servers():
@@ -84,8 +86,9 @@ def shutdown_test_servers_and_start_normal_servers():
     num_vms = 10
     for i in range(1, num_vms + 1):
         print('Shutdown normal server for vm: ', i)
-        os.system("ssh vm{} supervisorctl stop MP1_Test".format(i))
-        os.system("ssh vm{} supervisorctl start MP1".format(i))
+        os.system("ssh vm{} /home/lihaolu2/.local/bin/supervisorctl -c /tmp/supervisord.conf stop MP1_Test".format(i))
+        os.system("ssh vm{} /home/lihaolu2/.local/bin/supervisorctl -c /tmp/supervisord.conf start MP1".format(i))
+        # os.system("ssh vm{} supervisorctl start MP1".format(i))
 
 
 if __name__ == '__main__':
@@ -98,21 +101,21 @@ if __name__ == '__main__':
     shutdown_normal_servers_and_start_test_servers()
 
     # Known pattern on only one vm
-    unit_test("qwertyvm2", '1')
+    unit_test("qwertyvm2", ['0', '1', '0', '0', '0', '0', '0', '0', '0', '0'])
 
     # Known pattern on two vms
-    unit_test("zxcvvm2\|zxcvvm3", '2')
+    unit_test("zxcvvm2\|zxcvvm3", ['0', '1', '1', '0', '0', '0', '0', '0', '0', '0'])
 
     # Known pattern on three vms
-    unit_test("zxcvvm1\|zxcvvm2\|zxcvvm3", '3')
+    unit_test("zxcvvm1\|zxcvvm2\|zxcvvm3", ['1', '1', '1', '1', '0', '0', '0', '0', '0', '1'])
 
     # Known pattern on no vms
-    unit_test("zxcvvm2\&zxcvvm3", '0')
+    unit_test("zxcvvm2\&zxcvvm3", ['0', '0', '0', '0', '0', '0', '0', '0', '0', '0'])
 
     # Known pattern on all vms
-    unit_test("qwertyvm", '10')
+    unit_test("qwertyvm", ['1', '1', '1', '1', '1', '1', '1', '1', '1', '1'])
 
     # Known pattern on all vms (regex)
-    unit_test("qwertyvm*", '10')
+    unit_test("qwertyvm*", ['1', '1', '1', '1', '1', '1', '1', '1', '1', '1'])
 
     shutdown_test_servers_and_start_normal_servers()
